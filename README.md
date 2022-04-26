@@ -16,9 +16,9 @@ leave message, upload images.
 
 ## AWS Services
 * Server deploy on `EC2`.
-* Storage images in `S3`.
-* Uses `Cloudfront` to accelerate image transform.
-* With `RDS` with MySQL to manage database.
+* Store images in `S3`.
+* Use `Cloudfront` to accelerate image transform.
+* Use `RDS` with MySQL to manage database.
 
 ## Docker
 * Use image: python:3.9
