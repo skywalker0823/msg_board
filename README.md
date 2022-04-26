@@ -9,3 +9,4 @@ Uses Cloudfront to accelerate image transform.
 With RDS-Mysql to manage database.
 
 ## Structure
+![structure1 0 001](https://user-images.githubusercontent.com/56625237/165313866-9fbda115-4598-4c71-aa11-e7da136aeaff.jpeg)
