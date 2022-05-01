@@ -19,6 +19,7 @@ leave message, upload images.
 * Store images in `S3`.
 * Use `Cloudfront` to accelerate image transform.
 * Use `RDS` with MySQL to manage database.
+* Serve EC2 group with `ALB`(Load Balancer) & enable `HTTPS`.
 
 ## Docker
 * Use image: python:3.9
