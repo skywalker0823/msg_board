@@ -1,28 +1,6 @@
-# Simple message board with AWS services and deployed with Docker.
-
-This message board is created for testing AWS services.
-
-## Features
-leave message, upload images.
-
-## Structure
-![structure1 0 001](https://user-images.githubusercontent.com/56625237/165313866-9fbda115-4598-4c71-aa11-e7da136aeaff.jpeg)
-
-## Techniques
-* Backend: Python,Flask
-* Frontend: HTML,CSS,Javascript
-* AWS Services
-* Docker
-
-## AWS Services
-* Server deploy on `EC2`.
-* Store images in `S3`.
-* Use `Cloudfront` to accelerate image transform.
-* Use `RDS` with MySQL to manage database.
-* Serve EC2 group with `ALB`(Load Balancer) & enable `HTTPS`.
-
-## Docker
-* Use image: python:3.9
-
-## Overview
-
+# Steps of develop
+為解決上傳圖片時會卡住的問題，應將上傳圖片的部分改為非同步處理。
+1. For asynchronus needs, pip installed celery and redis
+2. Run redis with docker : docker run -dp 6379:6379 redis:5(you can use redis-cli to check if it is running locally and successfully)
+3. 將app.py 設置好後在另一個terminal執行 celery -A app.celery worker --loglevel=info
+4. 啟動 flask

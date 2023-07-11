@@ -1,6 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
-  get_imgs();
-});
+// document.addEventListener("DOMContentLoaded", () => {
+//   get_imgs();
+// });
 
 document.getElementById("send").addEventListener("click", () => {
   upload_say();
