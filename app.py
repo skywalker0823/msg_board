@@ -4,46 +4,40 @@ from config import aws_config
 import os
 import boto3
 import random, time
-# from celery_app import celery
+from dotenv import load_dotenv
 
 
-# 非同步新增組件 Redis, Celery
 from celery import Celery
 # from modules.celery_app import celery
+
+load_dotenv()
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__, static_folder="static",
             static_url_path="/", instance_relative_config=True)
 
 
-routes = ["localhost","b_redis"]
-for route in routes:
-    try:
-        app.config['CELERY_BROKER_URL'] = f'redis://{route}:6379'
-        print(f"redis connect to {route} success")
-        break
-    except Exception as e:
-        print("redis connect all fail")
-        print(e)
-        continue
+#自動連接
+# routes = ["localhost","b_redis"]
+# for route in routes:
+#     try:
+#         app.config['CELERY_BROKER_URL'] = f'redis://{route}:6379'
+#         print(f"redis connect to {route} success")
+#         break
+#     except Exception as e:
+#         print("redis connect all fail")
+#         print(e)
+#         continue
+app.config['CELERY_BROKER_URL'] = os.getenv('REDIS_CONN')
+app.config['CELERY_RESULT_BACKEND'] = os.getenv('REDIS_CONN')
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
-
-
-
-
-
-
-
-
-
 
 
 s3 = boto3.client("s3",
                     aws_access_key_id = aws_config.ACCESS_KEY_ID,
                     aws_secret_access_key = aws_config.ACCESS_SECRET_ID
                     )
-
 BUCKET_NAME = "motivetag"
 
 @app.route('/')
@@ -104,7 +98,7 @@ def async_uploader(filename):
         )
         print("upload complete! delete file")
         os.remove(filename)
-        return jsonify({"status":"ok"})
+        # return jsonify({"status":"ok"})
 
 
 @app.route("/imgs",methods=["GET"])
