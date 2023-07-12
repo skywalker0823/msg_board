@@ -1,0 +1,20 @@
+version: '3'
+services:
+  flask:
+    ports:
+      - "3000:3000"
+    build: .
+    depends_on:
+      - redis
+    container_name: b_flask
+  worker:
+    build: .
+    command: celery -A app.celery worker --loglevel=info
+    restart: always
+    depends_on:
+      - redis
+      - flask
+    container_name: b_worker
+  redis:
+    image: redis:5
+    container_name: b_redis

@@ -3,24 +3,40 @@ from werkzeug.utils import secure_filename
 from config import aws_config
 import os
 import boto3
-import random
+import random, time
+# from celery_app import celery
 
 
 # 非同步新增組件 Redis, Celery
 from celery import Celery
-
-
+# from modules.celery_app import celery
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-
 app = Flask(__name__, static_folder="static",
             static_url_path="/", instance_relative_config=True)
 
-# 因應非同步新增設置 請先確認是否有完成安裝 redis
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+
+routes = ["localhost","b_redis"]
+for route in routes:
+    try:
+        app.config['CELERY_BROKER_URL'] = f'redis://{route}:6379'
+        print(f"redis connect to {route} success")
+        break
+    except Exception as e:
+        print("redis connect all fail")
+        print(e)
+        continue
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
+
+
+
+
+
+
+
+
+
 
 
 s3 = boto3.client("s3",
@@ -35,18 +51,42 @@ def index():
     return rt("index.html")
 
 
+@app.route('/call',methods=["GET"])
+def call():
+    return jsonify({"ok":"ok"})
+
+
 @app.route("/upload",methods=["POST"])
 def upload():
     try:
         img = request.files["image"]
-        if img:
-            filename = secure_filename(img.filename)
+        says = request.form["says"]
+        type = request.form["type"]
+        print(says)
+        filename = secure_filename(img.filename)
+        filename = str(random.randint(1,100000))+"_"+filename
+        if img and type=="async":
             img.save(filename)
 
             async_uploader.delay(filename)
-            return jsonify({"ok":"upload complete!","msg":"ok"})
+
+            print("upload response")
+            return jsonify({"ok":"upload complete!","msg":"async"})
+        elif img and type=="sync":
+            img.save(filename)
+            print("uploading please wait")
+            time.sleep(5)
+            s3.upload_file(
+                Bucket = BUCKET_NAME,
+                Filename = filename,
+                Key = "test_"+str(random.randint(1,100000))
+            )
+            print("upload complete! delete file")
+            os.remove(filename)
+            return jsonify({"ok":"upload complete!","msg":"sync"})    
         else:
             return jsonify({"error":True})
+
     except Exception as e:
         print("type error: " + str(e))
         print(f"failed to upload file, delete file{filename}")
@@ -56,6 +96,7 @@ def upload():
 def async_uploader(filename):
     with app.app_context():
         print("start upload")
+        time.sleep(5)
         s3.upload_file(
             Bucket = BUCKET_NAME,
             Filename = filename,
@@ -74,3 +115,11 @@ def get_all_img():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3000, debug=True)
+
+
+
+
+# Note:
+# Redis: docker run -dp 6379:6379 redis:5
+# Celery: celery -A app.celery worker --loglevel=info
+# docker-compose -f docker-compose.yaml up -d --build 

@@ -11,15 +11,19 @@
     <div>留言板</div>
     <div >
         <input type="text" id="says">
-        <button id="send">送出</button>
+        <button id="send">非同步送出</button>
+        <button id="sync_send">同步送出</button>
+        <button id="call">煩server</button>
+        <button id="clear">清除訊息</button>
     </div>
 
 
     <input type="file" id="image_up" accept="image/jpeg, image/png, image/jpg">
-    
-    <div id="box" style="display: flex;flex-direction: column;">
+    <div id="file_size"></div>
+    <div id="box" style="display: flex;flex-direction: column;"></div>
 
-    </div>
+    <div id="result_messages"></div>
+    <div id="result_call">server線上狀態</div>
 
 <script src="/index.js"></script>
 </body>
